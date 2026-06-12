@@ -11,8 +11,10 @@ export default function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
 
   async function handleLogout() {
-    await fetch('/api/logout', { method: 'POST' })
-    window.location.href = '/login'
+    await supabase.auth.signOut()
+    setMenuOpen(false)
+    router.replace('/login')
+    router.refresh()
   }
 
   const tabs = [
