@@ -27,13 +27,19 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  if (!user && !request.nextUrl.pathname.startsWith('/login')) {
+  // Kalau tidak login dan bukan di halaman auth, redirect ke login
+  if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/reset-password')) {
     return NextResponse.redirect(new URL('/login', request.url))
+  }
+
+  // Kalau sudah login dan ke halaman login, redirect ke feed
+  if (user && request.nextUrl.pathname.startsWith('/login')) {
+    return NextResponse.redirect(new URL('/feed', request.url))
   }
 
   return supabaseResponse
 }
 
 export const config = {
-  matcher: ['/feed/:path*', '/recap/:path*', '/memory/:path*'],
+  matcher: ['/feed/:path*', '/recap/:path*', '/onthisday/:path*', '/login', '/reset-password'],
 }
