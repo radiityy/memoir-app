@@ -1,8 +1,13 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+const protectedRoutes = ['/feed', '/recap', '/onthisday']
+const authRoutes = ['/login']
+
 export async function middleware(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request })
+  let response = NextResponse.next({
+    request,
+  })
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -13,33 +18,53 @@ export async function middleware(request: NextRequest) {
           return request.cookies.getAll()
         },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
+          cookiesToSet.forEach(({ name, value }) => {
             request.cookies.set(name, value)
-          )
-          supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
-          )
+          })
+
+          response = NextResponse.next({
+            request,
+          })
+
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options)
+          })
         },
       },
-    }
+    },
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Kalau tidak login dan bukan di halaman auth, redirect ke login
-  if (!user && !request.nextUrl.pathname.startsWith('/login') && !request.nextUrl.pathname.startsWith('/reset-password')) {
-    return NextResponse.redirect(new URL('/login', request.url))
+  const pathname = request.nextUrl.pathname
+
+  const isProtectedRoute = protectedRoutes.some((route) =>
+    pathname.startsWith(route),
+  )
+
+  const isAuthRoute = authRoutes.some((route) => pathname.startsWith(route))
+
+  if (isProtectedRoute && !user) {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = '/login'
+    redirectUrl.search = ''
+
+    return NextResponse.redirect(redirectUrl)
   }
 
-  // Kalau sudah login dan ke halaman login, redirect ke feed
-  if (user && request.nextUrl.pathname.startsWith('/login')) {
-    return NextResponse.redirect(new URL('/feed', request.url))
+  if (isAuthRoute && user) {
+    const redirectUrl = request.nextUrl.clone()
+    redirectUrl.pathname = '/feed'
+    redirectUrl.search = ''
+
+    return NextResponse.redirect(redirectUrl)
   }
 
-  return supabaseResponse
+  return response
 }
 
 export const config = {
-  matcher: ['/feed/:path*', '/recap/:path*', '/onthisday/:path*', '/login', '/reset-password'],
+  matcher: ['/feed/:path*', '/recap/:path*', '/onthisday/:path*', '/login'],
 }

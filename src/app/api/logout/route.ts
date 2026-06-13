@@ -1,8 +1,29 @@
-import { createClient } from '@/lib/supabase/server'
-import { NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
-export async function POST() {
-  const supabase = await createClient()
+export async function POST(request: NextRequest) {
+  let response = NextResponse.json({ success: true })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          response = NextResponse.json({ success: true })
+
+          cookiesToSet.forEach(({ name, value, options }) => {
+            response.cookies.set(name, value, options)
+          })
+        },
+      },
+    },
+  )
+
   await supabase.auth.signOut()
-  return NextResponse.redirect(new URL('/login', 'http://localhost:3000'))
+
+  return response
 }
