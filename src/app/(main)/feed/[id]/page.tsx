@@ -48,7 +48,7 @@ export default function DetailPage() {
 
   async function handleDelete() {
     if (!memory) return
-    if (!confirm('Hapus memory ini?')) return
+    if (!confirm('Delete this memory?')) return
 
     setDeleting(true)
 
@@ -68,7 +68,7 @@ export default function DetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f7f4ef] flex items-center justify-center">
-        <p className="text-sm text-[#888780]">memuat...</p>
+        <p className="text-sm text-[#888780]">loading...</p>
       </div>
     )
   }
@@ -76,7 +76,7 @@ export default function DetailPage() {
   if (!memory) {
     return (
       <div className="min-h-screen bg-[#f7f4ef] flex items-center justify-center">
-        <p className="text-sm text-[#888780]">memory tidak ditemukan.</p>
+        <p className="text-sm text-[#888780]">memory not found.</p>
       </div>
     )
   }
@@ -88,11 +88,11 @@ export default function DetailPage() {
           onClick={() => router.back()}
           className="text-sm text-[#888780] hover:text-[#1a1a18] transition-colors"
         >
-          ← kembali
+          ← back
         </button>
 
         <p className="text-sm text-[#888780]">
-          {new Date(memory.created_at).toLocaleDateString('id-ID', {
+          {new Date(memory.created_at).toLocaleDateString('en-US', {
             weekday: 'long',
             day: 'numeric',
             month: 'long',
@@ -105,7 +105,7 @@ export default function DetailPage() {
           disabled={deleting}
           className="text-xs text-[#c0392b] hover:opacity-70 transition-opacity disabled:opacity-50"
         >
-          {deleting ? 'menghapus...' : 'hapus'}
+          {deleting ? 'deleting...' : 'delete'}
         </button>
       </div>
 
@@ -148,10 +148,10 @@ export default function DetailPage() {
 
         <div className="bg-[#fdfcf8] border border-[#e8e0d0] rounded-xl p-4 mb-4">
           <p className="text-[10px] text-[#B4B2A9] uppercase tracking-widest mb-2">
-            refleksi hari ini
+            note
           </p>
           <p className="font-serif text-sm text-[#444441] leading-relaxed italic">
-            refleksi AI akan muncul di sini setelah integrasi Claude selesai.
+            a small piece of today, kept before it slips away.
           </p>
         </div>
 
@@ -159,7 +159,7 @@ export default function DetailPage() {
           onClick={() => router.back()}
           className="w-full border border-[#e0d9ce] text-[#5F5E5A] rounded-lg py-2.5 text-sm hover:border-[#1a1a18] hover:text-[#1a1a18] transition-colors"
         >
-          kembali ke feed
+          back to feed
         </button>
       </div>
     </div>

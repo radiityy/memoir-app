@@ -61,7 +61,7 @@ export default function OnThisDayPage() {
     fetchOnThisDay()
   }, [fetchOnThisDay])
 
-  const today = new Date().toLocaleDateString('id-ID', {
+  const today = new Date().toLocaleDateString('en-US', {
     day: 'numeric',
     month: 'long',
   })
@@ -69,7 +69,7 @@ export default function OnThisDayPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f7f4ef] flex items-center justify-center">
-        <p className="text-sm text-[#888780]">memuat...</p>
+        <p className="text-sm text-[#888780]">loading...</p>
       </div>
     )
   }
@@ -80,17 +80,17 @@ export default function OnThisDayPage() {
         <div className="mb-6">
           <p className="font-serif text-2xl text-[#1a1a18]">{today}</p>
           <p className="text-sm text-[#888780] mt-1">
-            kenangan dari tahun-tahun lalu
+            old light from another year.
           </p>
         </div>
 
         {memories.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-2">
+          <div className="flex flex-col items-center justify-center h-64 gap-2 text-center px-6">
             <p className="font-serif text-lg text-[#888780]">
-              belum ada kenangan.
+              nothing from this day yet.
             </p>
             <p className="text-sm text-[#B4B2A9]">
-              tahun depan, hari ini akan muncul di sini.
+              one day, today may find its way back to you.
             </p>
           </div>
         ) : (
@@ -102,7 +102,7 @@ export default function OnThisDayPage() {
               return (
                 <div key={memory.id}>
                   <p className="text-xs text-[#888780] uppercase tracking-widest mb-3">
-                    {year} · {yearsAgo} tahun lalu
+                    {year} · {yearsAgo} years ago
                   </p>
 
                   <button

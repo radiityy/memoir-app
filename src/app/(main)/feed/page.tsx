@@ -44,7 +44,7 @@ export default function FeedPage() {
 
       if (data.length > 0) {
         const firstMonth = new Date(data[0].created_at).toLocaleDateString(
-          'id-ID',
+          'en-US',
           {
             month: 'long',
             year: 'numeric',
@@ -63,7 +63,7 @@ export default function FeedPage() {
   }, [fetchMemories])
 
   const grouped = memories.reduce<Record<string, Memory[]>>((acc, memory) => {
-    const month = new Date(memory.created_at).toLocaleDateString('id-ID', {
+    const month = new Date(memory.created_at).toLocaleDateString('en-US', {
       month: 'long',
       year: 'numeric',
     })
@@ -136,23 +136,23 @@ export default function FeedPage() {
         <div className="flex-1 px-5 py-5 overflow-x-hidden">
           {loading ? (
             <div className="flex items-center justify-center h-40">
-              <p className="text-sm text-[#888780]">memuat...</p>
+              <p className="text-sm text-[#888780]">loading...</p>
             </div>
           ) : memories.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-64 gap-3">
+            <div className="flex flex-col items-center justify-center h-64 gap-3 text-center px-6">
               <p className="font-serif text-lg text-[#888780]">
-                belum ada memory.
+                no memories yet.
               </p>
 
               <p className="text-sm text-[#B4B2A9]">
-                mulai abadikan momenmu hari ini.
+                start with one small moment.
               </p>
 
               <button
                 onClick={() => router.push('/feed/upload')}
                 className="mt-2 bg-[#1a1a18] text-[#f7f4ef] text-xs font-medium px-4 py-2 rounded-lg"
               >
-                + Memory pertama
+                + First memory
               </button>
             </div>
           ) : (
@@ -197,7 +197,7 @@ export default function FeedPage() {
 
                           <p className="text-[9px] text-[#B4B2A9] mt-1 text-left">
                             {new Date(memory.created_at).toLocaleDateString(
-                              'id-ID',
+                              'en-US',
                               {
                                 day: 'numeric',
                                 month: 'short',

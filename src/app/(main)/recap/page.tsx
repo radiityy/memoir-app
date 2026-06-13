@@ -64,7 +64,7 @@ export default function RecapPage() {
     const grouped = memories.reduce<Record<string, DayGroup>>((acc, memory) => {
       const date = new Date(memory.created_at).toISOString().split('T')[0]
 
-      const label = new Date(memory.created_at).toLocaleDateString('id-ID', {
+      const label = new Date(memory.created_at).toLocaleDateString('en-US', {
         day: 'numeric',
         month: 'long',
         year: 'numeric',
@@ -88,7 +88,7 @@ export default function RecapPage() {
 
   const months: MonthGroup[] = useMemo(() => {
     const grouped = memories.reduce<Record<string, MonthGroup>>((acc, memory) => {
-      const month = new Date(memory.created_at).toLocaleDateString('id-ID', {
+      const month = new Date(memory.created_at).toLocaleDateString('en-US', {
         month: 'long',
         year: 'numeric',
       })
@@ -111,7 +111,7 @@ export default function RecapPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-[#f7f4ef] flex items-center justify-center">
-        <p className="text-sm text-[#888780]">memuat...</p>
+        <p className="text-sm text-[#888780]">loading...</p>
       </div>
     )
   }
@@ -120,19 +120,19 @@ export default function RecapPage() {
     <div className="min-h-screen bg-[#f7f4ef]">
       <div className="max-w-2xl mx-auto px-5 py-6">
         {memories.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-64 gap-3">
+          <div className="flex flex-col items-center justify-center h-64 gap-3 text-center px-6">
             <p className="font-serif text-lg text-[#888780]">
-              belum ada memory.
+              nothing to look back on yet.
             </p>
             <p className="text-sm text-[#B4B2A9]">
-              upload foto pertamamu dulu!
+              save a few moments, and they will gather here.
             </p>
           </div>
         ) : (
           <>
             <div className="mb-10">
               <p className="text-xs text-[#888780] uppercase tracking-widest mb-5">
-                harian
+                daily
               </p>
 
               <div className="flex flex-col gap-6">
@@ -179,13 +179,13 @@ export default function RecapPage() {
 
                       <div className="bg-[#fdfcf8] border border-[#e8e0d0] rounded-lg px-4 py-3">
                         <p className="text-[9px] text-[#B4B2A9] uppercase tracking-widest mb-1.5">
-                          refleksi
+                          note
                         </p>
 
                         <p className="font-serif text-xs text-[#444441] leading-relaxed italic">
                           {day.memories.length > 1
-                            ? `${day.memories.length} momen hari ini — refleksi AI akan hadir segera.`
-                            : 'Satu momen hari ini — refleksi AI akan hadir segera.'}
+                            ? 'these moments made the day worth keeping.'
+                            : 'one small moment, saved before the day moved on.'}
                         </p>
                       </div>
                     </div>
@@ -196,7 +196,7 @@ export default function RecapPage() {
 
             <div>
               <p className="text-xs text-[#888780] uppercase tracking-widest mb-5">
-                bulanan
+                monthly
               </p>
 
               <div className="flex flex-col gap-4">
@@ -253,7 +253,9 @@ export default function RecapPage() {
                           <p className="font-serif text-lg text-[#c0392b]">
                             {locations.length}
                           </p>
-                          <p className="text-[10px] text-[#888780]">lokasi</p>
+                          <p className="text-[10px] text-[#888780]">
+                            places
+                          </p>
                         </div>
 
                         <div className="bg-[#f7f4ef] rounded-lg p-2.5 text-center">
@@ -279,11 +281,12 @@ export default function RecapPage() {
 
                       <div className="mt-3 bg-[#1a1a18] rounded-lg px-4 py-3">
                         <p className="text-[9px] text-[#888780] uppercase tracking-widest mb-1.5">
-                          narasi bulan ini
+                          month note
                         </p>
 
                         <p className="font-serif text-xs text-[#f0ece4] leading-relaxed italic">
-                          narasi AI untuk {monthGroup.month} akan hadir segera.
+                          this month held {monthGroup.memories.length} memories
+                          — quiet proof that life kept happening.
                         </p>
                       </div>
                     </div>
