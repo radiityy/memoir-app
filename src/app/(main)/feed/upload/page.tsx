@@ -8,14 +8,14 @@ import { useDropzone, type FileRejection } from 'react-dropzone'
 import { createClient } from '@/lib/supabase/client'
 
 const MOODS = [
-  'bahagia',
-  'tenang',
-  'nostalgia',
-  'syukur',
-  'semangat',
-  'lelah',
-  'galau',
-  'bangga',
+  'happy',
+  'calm',
+  'nostalgic',
+  'grateful',
+  'hopeful',
+  'tired',
+  'blue',
+  'proud',
 ]
 
 const TAPE_COLORS = ['#fac775', '#AFA9EC', '#9FE1CB', '#F4C0D1', '#f0997b', '#a8d8ea']
@@ -56,16 +56,16 @@ export default function UploadPage() {
     const reason = rejection?.errors[0]?.code
 
     if (reason === 'file-too-large') {
-      setError('Ukuran foto maksimal 5MB.')
+      setError('photo must be under 5MB.')
       return
     }
 
     if (reason === 'file-invalid-type') {
-      setError('File harus berupa gambar.')
+      setError('file must be an image.')
       return
     }
 
-    setError('Foto tidak valid. Coba pilih foto lain.')
+    setError('Upload failed. Please try again.')
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -80,22 +80,22 @@ export default function UploadPage() {
 
   async function handleSave() {
     if (!file) {
-      setError('Pilih foto dulu ya.')
+      setError('choose a photo first.')
       return
     }
 
     if (!caption.trim()) {
-      setError('Caption wajib diisi.')
+      setError('write a caption first.')
       return
     }
 
     if (file.size > MAX_FILE_SIZE) {
-      setError('Ukuran foto maksimal 5MB.')
+      setError('photo must be under 5MB.')
       return
     }
 
     if (!file.type.startsWith('image/')) {
-      setError('File harus berupa gambar.')
+      setError('file must be an image.')
       return
     }
 
@@ -143,7 +143,7 @@ export default function UploadPage() {
 
       router.push('/feed')
     } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Upload gagal.'
+      const message = error instanceof Error ? error.message : 'upload failed.'
       setError(message)
     } finally {
       setLoading(false)
@@ -157,10 +157,10 @@ export default function UploadPage() {
           onClick={() => router.back()}
           className="text-sm text-[#888780] hover:text-[#1a1a18] transition-colors flex items-center gap-1"
         >
-          ← kembali
+          back
         </button>
 
-        <h1 className="font-serif text-lg text-[#1a1a18]">memory baru</h1>
+        <h1 className="font-serif text-lg text-[#1a1a18]">new memory</h1>
 
         <div className="w-16" />
       </div>
@@ -185,7 +185,7 @@ export default function UploadPage() {
                 />
               ) : (
                 <div className="w-full aspect-square bg-[#f0ece4] flex items-center justify-center">
-                  <span className="text-xs text-[#B4B2A9]">foto</span>
+                  <span className="text-xs text-[#B4B2A9]">photo</span>
                 </div>
               )}
 
@@ -236,7 +236,7 @@ export default function UploadPage() {
           <div className="flex-1 flex flex-col gap-4">
             <div>
               <p className="text-[10px] text-[#888780] uppercase tracking-wide mb-1.5">
-                foto
+                photo
               </p>
 
               <div
@@ -250,7 +250,7 @@ export default function UploadPage() {
                 <input {...getInputProps()} />
 
                 <p className="text-xs text-[#B4B2A9]">
-                  {isDragActive ? 'lepas di sini' : 'klik atau drag foto maksimal 5MB'}
+                  {isDragActive ? 'lepas di sini' : 'klik atau drag photo maksimal 5MB'}
                 </p>
               </div>
             </div>
@@ -263,7 +263,7 @@ export default function UploadPage() {
               <textarea
                 value={caption}
                 onChange={(e) => setCaption(e.target.value)}
-                placeholder="tulis sesuatu tentang momen ini..."
+                placeholder="write a little about this moment..."
                 rows={3}
                 className="w-full bg-[#f7f4ef] border border-[#e0d9ce] rounded-lg px-3 py-2 text-sm text-[#1a1a18] font-serif outline-none focus:border-[#1a1a18] transition-colors resize-none placeholder:text-[#B4B2A9] placeholder:not-italic"
               />
@@ -293,13 +293,13 @@ export default function UploadPage() {
 
             <div>
               <p className="text-[10px] text-[#888780] uppercase tracking-wide mb-1.5">
-                lokasi
+                place
               </p>
 
               <input
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="di mana momen ini?"
+                placeholder="where did this happen?"
                 className="w-full bg-[#f7f4ef] border border-[#e0d9ce] rounded-lg px-3 py-2 text-sm text-[#1a1a18] outline-none focus:border-[#1a1a18] transition-colors placeholder:text-[#B4B2A9]"
               />
             </div>
@@ -313,7 +313,7 @@ export default function UploadPage() {
           disabled={loading || !file || !caption.trim()}
           className="w-full bg-[#1a1a18] text-[#f7f4ef] rounded-lg py-3 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
         >
-          {loading ? 'menyimpan...' : 'simpan memory'}
+          {loading ? 'saving...' : 'save memory'}
         </button>
       </div>
     </div>

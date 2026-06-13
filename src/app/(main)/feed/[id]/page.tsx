@@ -30,10 +30,20 @@ export default function DetailPage() {
 
   useEffect(() => {
     async function fetchMemory() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
       const { data } = await supabase
         .from('memories')
         .select('*')
         .eq('id', id)
+        .eq('user_id', user.id)
         .single()
 
       if (data) {
@@ -44,7 +54,7 @@ export default function DetailPage() {
     }
 
     fetchMemory()
-  }, [id, supabase])
+  }, [id, router, supabase])
 
   async function handleDelete() {
     if (!memory) return
@@ -53,11 +63,24 @@ export default function DetailPage() {
     setDeleting(true)
 
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!user) {
+        router.push('/login')
+        return
+      }
+
       if (memory.photo_path) {
         await supabase.storage.from('memories').remove([memory.photo_path])
       }
 
-      await supabase.from('memories').delete().eq('id', id)
+      await supabase
+        .from('memories')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', user.id)
 
       router.push('/feed')
     } finally {
@@ -138,8 +161,8 @@ export default function DetailPage() {
               )}
 
               {memory.location && (
-                <span className="text-xs text-[#B4B2A9]">
-                  📍 {memory.location}
+                <span className="text-xs text-[#B4B2A9] italic">
+                  from {memory.location}
                 </span>
               )}
             </div>

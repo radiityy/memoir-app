@@ -38,7 +38,6 @@ export default function Navbar() {
           memoir<span className="text-[#c0392b]">.</span>
         </h1>
 
-        {/* Desktop tabs */}
         <div className="hidden md:flex bg-[#ede9e1] rounded-full px-1 py-1 gap-1">
           {tabs.map(tab => (
             <button
@@ -61,17 +60,16 @@ export default function Navbar() {
             className="bg-[#1a1a18] text-[#f7f4ef] text-xs font-medium px-3 py-2 rounded-lg flex items-center gap-1 hover:opacity-90 transition-opacity"
           >
             <span className="text-base leading-none">+</span>
-            <span className="hidden sm:inline ml-1">Memory</span>
+            <span className="hidden sm:inline ml-1">New Memory</span>
           </button>
 
           <button
             onClick={handleLogout}
             className="hidden md:block text-xs text-[#888780] hover:text-[#1a1a18] transition-colors"
           >
-            keluar
+            sign out
           </button>
 
-          {/* Mobile menu button */}
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden p-2 text-[#888780] hover:text-[#1a1a18] transition-colors"
@@ -86,7 +84,6 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile dropdown */}
       {menuOpen && (
         <div className="md:hidden border-t border-[#e0d9ce] bg-white px-4 py-3 flex flex-col gap-1">
           {tabs.map(tab => (
@@ -106,7 +103,7 @@ export default function Navbar() {
             onClick={handleLogout}
             className="text-left px-3 py-2.5 text-sm text-[#c0392b] mt-1"
           >
-            keluar
+            sign out
           </button>
         </div>
       )}

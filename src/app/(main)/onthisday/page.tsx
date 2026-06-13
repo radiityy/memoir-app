@@ -40,6 +40,7 @@ export default function OnThisDayPage() {
     const { data } = await supabase
       .from('memories')
       .select('*')
+      .eq('user_id', user.id)
       .filter('created_at', 'lt', `${todayDate.getFullYear()}-01-01`)
 
     if (data) {

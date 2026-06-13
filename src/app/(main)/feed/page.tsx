@@ -34,11 +34,12 @@ export default function FeedPage() {
       return
     }
 
-    const { data } = await supabase
-      .from('memories')
-      .select('*')
-      .order('created_at', { ascending: false })
-
+  const { data } = await supabase
+    .from('memories')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+    
     if (data) {
       setMemories(data)
 
