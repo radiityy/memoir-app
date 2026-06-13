@@ -14,6 +14,7 @@ type Memory = {
   mood: string | null
   location: string | null
   tape_color: string
+  is_favorite: boolean
   created_at: string
 }
 

@@ -14,6 +14,7 @@ type Memory = {
   mood: string | null
   location: string | null
   tape_color: string
+  is_favorite: boolean
   created_at: string
 }
 
@@ -28,6 +29,7 @@ export default function DetailPage() {
   const [loading, setLoading] = useState(true)
   const [deleting, setDeleting] = useState(false)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  const [favoriting, setFavoriting] = useState(false)
 
   const fetchMemory = useCallback(async () => {
     const {
@@ -106,6 +108,50 @@ export default function DetailPage() {
       setShowDeleteModal(false)
     }
   }
+
+  async function handleToggleFavorite() {
+  if (!memory) return
+
+  const nextFavorite = !memory.is_favorite
+
+  setFavoriting(true)
+  setMemory({
+    ...memory,
+    is_favorite: nextFavorite,
+  })
+
+  try {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      router.push('/login')
+      return
+    }
+
+    const { error } = await supabase
+      .from('memories')
+      .update({
+        is_favorite: nextFavorite,
+      })
+      .eq('id', id)
+      .eq('user_id', user.id)
+
+    if (error) {
+      throw error
+    }
+
+    router.refresh()
+  } catch {
+    setMemory({
+      ...memory,
+      is_favorite: !nextFavorite,
+    })
+  } finally {
+    setFavoriting(false)
+  }
+}
 
   if (loading) {
     return (
@@ -207,12 +253,26 @@ export default function DetailPage() {
           </p>
         </div>
 
-        <button
-          onClick={() => router.push('/feed')}
-          className="w-full border border-[#e0d9ce] text-[#5F5E5A] rounded-lg py-2.5 text-sm hover:border-[#1a1a18] hover:text-[#1a1a18] transition-colors"
-        >
-          back to feed
-        </button>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={handleToggleFavorite}
+            disabled={favoriting}
+            className={`w-full rounded-lg py-2.5 text-sm transition-colors disabled:opacity-50 ${
+              memory.is_favorite
+                ? 'bg-[#1a1a18] text-[#f7f4ef]'
+                : 'border border-[#e0d9ce] text-[#5F5E5A] hover:border-[#1a1a18] hover:text-[#1a1a18]'
+            }`}
+          >
+            {memory.is_favorite ? 'kept close' : 'keep close'}
+          </button>
+
+          <button
+            onClick={() => router.push('/feed')}
+            className="w-full border border-[#e0d9ce] text-[#5F5E5A] rounded-lg py-2.5 text-sm hover:border-[#1a1a18] hover:text-[#1a1a18] transition-colors"
+          >
+            back to feed
+          </button>
+        </div>
       </div>
 
       {showDeleteModal && (
