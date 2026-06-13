@@ -16,8 +16,35 @@ const geistMono = localFont({
 })
 
 export const metadata: Metadata = {
-  title: 'Memoir',
-  description: 'Save your favorite moments in a simple and nostalgic way.',
+  title: {
+    default: 'Memoir',
+    template: '%s · Memoir',
+  },
+  description:
+    'A quiet place to save photos, notes, moods, and little pieces of your everyday life.',
+  applicationName: 'Memoir',
+  keywords: ['Memoir', 'memory journal', 'photo diary', 'personal journal'],
+  authors: [{ name: 'Memoir' }],
+  creator: 'Memoir',
+  publisher: 'Memoir',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
+  openGraph: {
+    title: 'Memoir',
+    description:
+      'Keep the small moments before they fade.',
+    siteName: 'Memoir',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary',
+    title: 'Memoir',
+    description:
+      'Keep the small moments before they fade.',
+  },
 }
 
 export default function RootLayout({
@@ -26,7 +53,7 @@ export default function RootLayout({
   children: ReactNode
 }>) {
   return (
-    <html lang="id">
+    <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
