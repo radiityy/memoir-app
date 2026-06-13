@@ -4,7 +4,7 @@
 
 import { useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useDropzone } from 'react-dropzone'
+import { useDropzone, type FileRejection } from 'react-dropzone'
 import { createClient } from '@/lib/supabase/client'
 
 const MOODS = [
@@ -19,6 +19,7 @@ const MOODS = [
 ]
 
 const TAPE_COLORS = ['#fac775', '#AFA9EC', '#9FE1CB', '#F4C0D1', '#f0997b', '#a8d8ea']
+const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 export default function UploadPage() {
   const router = useRouter()
@@ -38,21 +39,63 @@ export default function UploadPage() {
 
     if (!selectedFile) return
 
+    setError('')
     setFile(selectedFile)
-    setPreview(URL.createObjectURL(selectedFile))
+
+    setPreview((currentPreview) => {
+      if (currentPreview) {
+        URL.revokeObjectURL(currentPreview)
+      }
+
+      return URL.createObjectURL(selectedFile)
+    })
+  }, [])
+
+  const onDropRejected = useCallback((fileRejections: FileRejection[]) => {
+    const rejection = fileRejections[0]
+    const reason = rejection?.errors[0]?.code
+
+    if (reason === 'file-too-large') {
+      setError('Ukuran foto maksimal 5MB.')
+      return
+    }
+
+    if (reason === 'file-invalid-type') {
+      setError('File harus berupa gambar.')
+      return
+    }
+
+    setError('Foto tidak valid. Coba pilih foto lain.')
   }, [])
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
+    onDropRejected,
     accept: {
       'image/*': [],
     },
     maxFiles: 1,
+    maxSize: MAX_FILE_SIZE,
   })
 
   async function handleSave() {
     if (!file) {
       setError('Pilih foto dulu ya.')
+      return
+    }
+
+    if (!caption.trim()) {
+      setError('Caption wajib diisi.')
+      return
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      setError('Ukuran foto maksimal 5MB.')
+      return
+    }
+
+    if (!file.type.startsWith('image/')) {
+      setError('File harus berupa gambar.')
       return
     }
 
@@ -69,7 +112,7 @@ export default function UploadPage() {
         return
       }
 
-      const ext = file.name.split('.').pop()
+      const ext = file.name.split('.').pop()?.toLowerCase() || 'jpg'
       const path = `${user.id}/${Date.now()}.${ext}`
 
       const { error: uploadError } = await supabase.storage
@@ -87,9 +130,9 @@ export default function UploadPage() {
       const { error: dbError } = await supabase.from('memories').insert({
         user_id: user.id,
         photo_url: publicUrl,
-        caption,
-        mood,
-        location,
+        caption: caption.trim(),
+        mood: mood || null,
+        location: location.trim() || null,
         tape_color: tapeColor,
       })
 
@@ -206,7 +249,7 @@ export default function UploadPage() {
                 <input {...getInputProps()} />
 
                 <p className="text-xs text-[#B4B2A9]">
-                  {isDragActive ? 'lepas di sini' : 'klik atau drag foto'}
+                  {isDragActive ? 'lepas di sini' : 'klik atau drag foto maksimal 5MB'}
                 </p>
               </div>
             </div>
@@ -266,7 +309,7 @@ export default function UploadPage() {
 
         <button
           onClick={handleSave}
-          disabled={loading || !file}
+          disabled={loading || !file || !caption.trim()}
           className="w-full bg-[#1a1a18] text-[#f7f4ef] rounded-lg py-3 text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
         >
           {loading ? 'menyimpan...' : 'simpan memory'}
