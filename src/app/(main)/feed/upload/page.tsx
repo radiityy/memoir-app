@@ -130,6 +130,7 @@ export default function UploadPage() {
       const { error: dbError } = await supabase.from('memories').insert({
         user_id: user.id,
         photo_url: publicUrl,
+        photo_path: path,
         caption: caption.trim(),
         mood: mood || null,
         location: location.trim() || null,

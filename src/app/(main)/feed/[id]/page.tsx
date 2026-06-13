@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 type Memory = {
   id: string
   photo_url: string
+  photo_path: string | null
   caption: string
   mood: string | null
   location: string | null
@@ -25,6 +26,7 @@ export default function DetailPage() {
 
   const [memory, setMemory] = useState<Memory | null>(null)
   const [loading, setLoading] = useState(true)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     async function fetchMemory() {
@@ -45,10 +47,22 @@ export default function DetailPage() {
   }, [id, supabase])
 
   async function handleDelete() {
+    if (!memory) return
     if (!confirm('Hapus memory ini?')) return
 
-    await supabase.from('memories').delete().eq('id', id)
-    router.push('/feed')
+    setDeleting(true)
+
+    try {
+      if (memory.photo_path) {
+        await supabase.storage.from('memories').remove([memory.photo_path])
+      }
+
+      await supabase.from('memories').delete().eq('id', id)
+
+      router.push('/feed')
+    } finally {
+      setDeleting(false)
+    }
   }
 
   if (loading) {
@@ -88,9 +102,10 @@ export default function DetailPage() {
 
         <button
           onClick={handleDelete}
-          className="text-xs text-[#c0392b] hover:opacity-70 transition-opacity"
+          disabled={deleting}
+          className="text-xs text-[#c0392b] hover:opacity-70 transition-opacity disabled:opacity-50"
         >
-          hapus
+          {deleting ? 'menghapus...' : 'hapus'}
         </button>
       </div>
 
