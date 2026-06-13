@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 type Memory = {
   id: string
   photo_url: string
+  photo_path: string | null
   caption: string
   mood: string | null
   location: string | null
@@ -52,7 +53,22 @@ export default function OnThisDayPage() {
         )
       })
 
-      setMemories(filtered)
+      const memoriesWithSignedUrls = await Promise.all(
+        filtered.map(async (memory) => {
+          if (!memory.photo_path) return memory
+
+          const { data: signedData } = await supabase.storage
+            .from('memories')
+            .createSignedUrl(memory.photo_path, 60 * 60)
+
+          return {
+            ...memory,
+            photo_url: signedData?.signedUrl || memory.photo_url,
+          }
+        }),
+      )
+
+      setMemories(memoriesWithSignedUrls)
     }
 
     setLoading(false)

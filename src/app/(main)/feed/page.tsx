@@ -9,6 +9,7 @@ import { createClient } from '@/lib/supabase/client'
 type Memory = {
   id: string
   photo_url: string
+  photo_path: string | null
   caption: string
   mood: string | null
   location: string | null
@@ -34,23 +35,39 @@ export default function FeedPage() {
       return
     }
 
-  const { data } = await supabase
-    .from('memories')
-    .select('*')
-    .eq('user_id', user.id)
-    .order('created_at', { ascending: false })
-    
-    if (data) {
-      setMemories(data)
+    const { data } = await supabase
+      .from('memories')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
 
-      if (data.length > 0) {
-        const firstMonth = new Date(data[0].created_at).toLocaleDateString(
-          'en-US',
-          {
-            month: 'long',
-            year: 'numeric',
-          },
-        )
+    if (data) {
+      const memoriesWithSignedUrls = await Promise.all(
+        data.map(async (memory) => {
+          if (!memory.photo_path) {
+            return memory
+          }
+
+          const { data: signedData } = await supabase.storage
+            .from('memories')
+            .createSignedUrl(memory.photo_path, 60 * 60)
+
+          return {
+            ...memory,
+            photo_url: signedData?.signedUrl || memory.photo_url,
+          }
+        }),
+      )
+
+      setMemories(memoriesWithSignedUrls)
+
+      if (memoriesWithSignedUrls.length > 0) {
+        const firstMonth = new Date(
+          memoriesWithSignedUrls[0].created_at,
+        ).toLocaleDateString('en-US', {
+          month: 'long',
+          year: 'numeric',
+        })
 
         setActiveMonth(firstMonth)
       }

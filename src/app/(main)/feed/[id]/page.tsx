@@ -47,7 +47,20 @@ export default function DetailPage() {
         .single()
 
       if (data) {
-        setMemory(data)
+        let memoryWithSignedUrl = data
+
+        if (data.photo_path) {
+          const { data: signedData } = await supabase.storage
+            .from('memories')
+            .createSignedUrl(data.photo_path, 60 * 60)
+
+          memoryWithSignedUrl = {
+            ...data,
+            photo_url: signedData?.signedUrl || data.photo_url,
+          }
+        }
+
+        setMemory(memoryWithSignedUrl)
       }
 
       setLoading(false)
